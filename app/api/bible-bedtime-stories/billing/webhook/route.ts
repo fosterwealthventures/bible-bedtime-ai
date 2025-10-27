@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 // import your db client here
 
+export const runtime = "nodejs";
+
 export async function POST(req: NextRequest) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-06-20" as any });
   const sig = req.headers.get("stripe-signature")!;
@@ -26,5 +28,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ received: true });
 }
-
-export const config = { api: { bodyParser: false } }; // if using pages. In app router, the raw body is accessible via req.text()

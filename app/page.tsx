@@ -3,12 +3,16 @@ import Link from "next/link";
 import { useUI } from "@/lib/ui-state";
 import { STORIES } from "@/data/stories";
 import { StoryCard } from "@/components/StoryCard";
+import BrandProbe from "@/components/BrandProbe";
 
 export default function HomePage() {
   const { lang } = useUI();
   const featured = STORIES.slice(0, 3);
   return (
     <main className="pb-14">
+      <section className="container mt-6 mb-6">
+        <BrandProbe />
+      </section>
       <section className="container grid md:grid-cols-2 gap-8 items-center mt-6 mb-12">
         <div className="max-w-xl">
           <h1 className="text-4xl font-bold mb-3 leading-tight">
@@ -32,7 +36,7 @@ export default function HomePage() {
       <section className="container">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-xl font-semibold">{lang === "en" ? "Featured Stories" : "Historias destacadas"}</h2>
-          <Link href="/bible-bedtime-stories" className="text-brand.plum hover:underline">{lang === "en" ? "See all" : "Ver todas"}</Link>
+          <Link href="/bible-bedtime-stories" className="text-brand-plum hover:underline">{lang === "en" ? "See all" : "Ver todas"}</Link>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {featured.map(s => <StoryCard key={s.id} id={s.id} />)}

@@ -25,7 +25,7 @@ export function StoryCard({ id }: { id: string }) {
         <span className="badge absolute top-3 left-3">Ages {s.age}</span>
       </div>
       <div className="p-4">
-        <h3 className="font-semibold mb-1 text-brand.ink">{s.title[lang]}</h3>
+        <h3 className="font-semibold mb-1 text-brand-plum">{s.title[lang]}</h3>
         <p className="text-gray-600 text-sm mb-4">{s.subtitle[lang]}</p>
         <div className="flex items-center justify-between">
           <button onClick={play} disabled={loading} className="btn-primary disabled:opacity-60">

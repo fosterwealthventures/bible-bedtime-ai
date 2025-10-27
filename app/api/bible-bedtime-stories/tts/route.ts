@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TextToSpeechClient } from "@google-cloud/text-to-speech";
+export const runtime = "nodejs";
 
 /* env-driven Google TTS credentials (base64 preferred) */
 const b64 = process.env.GCP_TTS_CREDENTIALS_B64;

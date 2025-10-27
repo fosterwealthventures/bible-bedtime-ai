@@ -12,8 +12,8 @@ export default function SiteHeader() {
     return (
       <Link
         href={href}
-        className={`px-3 py-2 rounded-xl hover:bg-brand.lavender transition ${
-          active ? "bg-brand.lavender text-brand.plum" : "text-gray-700"
+        className={`px-3 py-2 rounded-xl hover:bg-brand-plum transition ${
+          active ? "bg-brand-plum text-white" : "text-gray-700"
         }`}
       >
         {children}
@@ -23,7 +23,7 @@ export default function SiteHeader() {
   return (
     <header className="w-full py-4">
       <div className="container flex items-center justify-between">
-        <Link href="/" className="text-lg font-semibold text-brand.ink">Bible Bedtime Stories</Link>
+        <Link href="/" className="text-lg font-semibold text-brand-plum">Bible Bedtime Stories</Link>
         <nav className="flex gap-1 items-center">
           <NavLink href="/">Home</NavLink>
           <NavLink href="/bible-bedtime-stories">Stories</NavLink>
@@ -37,7 +37,7 @@ export default function SiteHeader() {
           <option value="5-8">5–8</option>
           <option value="9-12">9–12</option>
         </select>
-        <button onClick={()=>setLang(lang==="en"?"es":"en")} className="ml-2 text-sm rounded-full border px-3 py-1 hover:bg-brand.lavender" title="Toggle EN/ES">
+        <button onClick={()=>setLang(lang==="en"?"es":"en")} className="ml-2 text-sm rounded-full border px-3 py-1 hover:bg-brand-plum" title="Toggle EN/ES">
           {lang.toUpperCase()}
         </button>
         </nav>
