@@ -1,0 +1,30 @@
+import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+// import your db client here
+
+export async function POST(req: NextRequest) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-06-20" as any });
+  const sig = req.headers.get("stripe-signature")!;
+  const raw = await req.text();
+
+  let event: Stripe.Event;
+  try {
+    event = stripe.webhooks.constructEvent(raw, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+  } catch (err: any) {
+    return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session;
+    const metaUserId = session.metadata?.userId!;
+    // Look up the price to decide plan:
+    const priceId = session.line_items?.data?.[0]?.price?.id || (session as any).display_items?.[0]?.plan?.id;
+    const plan = priceId === process.env.STRIPE_PRICE_YEARLY ? "yearly" : "monthly";
+
+    // await db.user.update({ where: { id: metaUserId }, data: { plan } });
+  }
+
+  return NextResponse.json({ received: true });
+}
+
+export const config = { api: { bodyParser: false } }; // if using pages. In app router, the raw body is accessible via req.text()

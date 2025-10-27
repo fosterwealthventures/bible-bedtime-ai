@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Background + type rhythm to match original mock */
+html, body {
+  background: linear-gradient(180deg, #faf8ff 0%, #ffffff 60%);
+  color: #1f1d2b;
+}
+.btn-primary {
+  @apply px-4 py-2 rounded-xl bg-brand.plum text-white hover:bg-brand.plumDark transition;
+}
+.btn-outline {
+  @apply px-4 py-2 rounded-xl border border-brand.plum text-brand.plum hover:bg-brand.lavender transition;
+}
+.badge {
+  @apply inline-flex items-center text-xs font-medium px-2 py-1 rounded-full bg-brand.lavender text-brand.plum;
+}
+.card {
+  @apply rounded-2xl border border-purple-100 bg-white shadow-soft;
+}

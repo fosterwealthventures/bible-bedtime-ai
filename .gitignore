@@ -1,0 +1,22 @@
+cat > .gitignore <<'EOF'
+# Dependencies & builds
+node_modules/
+.next/
+out/
+dist/
+coverage/
+.vercel/
+.pnpm-store/
+.turbo/
+
+# OS/editor
+.DS_Store
+*.log
+
+# Env & local config (KEEP THESE PRIVATE)
+.env*
+!.env.example
+firebase.json
+.firebaserc
+image_base64.txt
+EOF
