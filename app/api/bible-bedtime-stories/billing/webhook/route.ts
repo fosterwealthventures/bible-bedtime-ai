@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 // import your db client here
 
+// Ensure these API routes never prerender and always use the Node runtime
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {

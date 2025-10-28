@@ -14,6 +14,11 @@ const config: Config = {
           plum: "#6B21A8",
           "plum-dark": "#581C87",
         },
+        muted: "#f5f5f5",
+        primary: "#6B21A8",
+        "primary-foreground": "#ffffff",
+        accent: "#f0f0f0",
+        "accent-foreground": "#333333",
       },
       borderRadius: {
         xl: "1rem",
@@ -29,6 +34,11 @@ const config: Config = {
     "hover:bg-brand-plum-dark",
     "text-brand-plum",
     "border-brand-plum",
+    "bg-muted",
+    "bg-primary",
+    "text-primary-foreground",
+    "hover:bg-accent",
+    "hover:text-accent-foreground",
   ],
   plugins: [],
 };

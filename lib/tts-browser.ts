@@ -37,7 +37,7 @@ export async function ensureVoices(): Promise<SpeechSynthesisVoice[]> {
   return await waitForVoices();
 }
 
-export async function speakText(text: string, opts: TTSOptions = {}) {
+export async function speakText(text: string, opts: TTSOptions = {}): Promise<void> {
   if (typeof window === "undefined" || !("speechSynthesis" in window) || !text?.trim()) return;
 
   ensureAudioContext();
@@ -52,20 +52,25 @@ export async function speakText(text: string, opts: TTSOptions = {}) {
 
   const voices = await ensureVoices();
 
-  const utter = new SpeechSynthesisUtterance(text);
-  if (opts.rate) utter.rate = opts.rate;
-  if (opts.pitch) utter.pitch = opts.pitch;
-  if (opts.volume !== undefined) utter.volume = opts.volume;
+  return new Promise<void>((resolve, reject) => {
+    const utter = new SpeechSynthesisUtterance(text);
+    if (opts.rate) utter.rate = opts.rate;
+    if (opts.pitch) utter.pitch = opts.pitch;
+    if (opts.volume !== undefined) utter.volume = opts.volume;
 
-  if (opts.voice) {
-    const match = voices.find((v) => v.name === opts.voice);
-    if (match) utter.voice = match;
-  } else {
-    const en = voices.find((v) => v.lang?.toLowerCase().startsWith("en")) ?? voices[0];
-    if (en) utter.voice = en;
-  }
+    if (opts.voice) {
+      const match = voices.find((v) => v.name === opts.voice);
+      if (match) utter.voice = match;
+    } else {
+      const en = voices.find((v) => v.lang?.toLowerCase().startsWith("en")) ?? voices[0];
+      if (en) utter.voice = en;
+    }
 
-  synth.speak(utter);
+    utter.onend = () => resolve();
+    utter.onerror = (event) => reject(new Error(`Speech synthesis error: ${event.error}`));
+
+    synth.speak(utter);
+  });
 }
 
 export function stopSpeaking() {

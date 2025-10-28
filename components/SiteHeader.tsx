@@ -23,7 +23,10 @@ export default function SiteHeader() {
   return (
     <header className="w-full py-4">
       <div className="container flex items-center justify-between">
-        <Link href="/" className="text-lg font-semibold text-brand-plum">Bible Bedtime Stories</Link>
+        <Link href="/" className="flex flex-col">
+          <span className="text-lg font-semibold text-brand-plum">Bible Bedtime Stories</span>
+          <span className="text-xs text-muted-foreground">by Foster Wealth Ventures</span>
+        </Link>
         <nav className="flex gap-1 items-center">
           <NavLink href="/">Home</NavLink>
           <NavLink href="/bible-bedtime-stories">Stories</NavLink>

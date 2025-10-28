@@ -9,12 +9,12 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
-    // Load creds at runtime (not module scope)
+    // ensure node runtime and no prerender (declared at file top by step #1)
     let creds: any;
-    try {
-      creds = loadGcpTtsCredentials();
-    } catch (e: any) {
-      return new Response(`TTS creds missing: ${e?.message ?? e}`, { status: 500 });
+    try { 
+      creds = loadGcpTtsCredentials(); 
+    } catch (e: any) { 
+      return new Response(`TTS creds missing: ${e?.message ?? e}`, { status: 500 }); 
     }
     
     // normalize PEM for OpenSSL
@@ -61,15 +61,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No audio content generated", projectHint: projectId }, { status: 500 });
     }
 
-    return new NextResponse(Buffer.from(response.audioContent), {
+    // Generate/obtain audio as a Uint8Array/Buffer named `audioBytes`
+    const audioBytes = Buffer.from(response.audioContent);
+
+    return new Response(audioBytes, {
+      status: 200,
       headers: {
         "Content-Type": "audio/mpeg",
-        "Content-Length": response.audioContent.length.toString(),
-        "X-GCP-Project": projectId,
+        "Cache-Control": "no-store",
+        "Content-Length": String(audioBytes.length),
+        "Accept-Ranges": "bytes"
       },
     });
   } catch (error) {
-    console.error("TTS error:", error);
+    console.error("Voice TTS error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

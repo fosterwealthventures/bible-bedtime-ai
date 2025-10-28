@@ -9,28 +9,31 @@ import fs from "fs";
 import path from "path";
 import { stableHashSync } from "@/lib/hash";
 import { TextToSpeechClient } from "@google-cloud/text-to-speech";
-
-function loadGcpTtsCredentials(): any {
-  const raw = process.env.GCP_TTS_CREDENTIALS || process.env.GCP_TTS_CREDENTIALS_B64;
-  if (!raw) {
-    throw new Error("GCP_TTS_CREDENTIALS env var is not set");
-  }
-  // Support either single-line JSON or base64-encoded JSON
-  const json = raw.trim().startsWith("{")
-    ? raw
-    : Buffer.from(raw, "base64").toString("utf8");
-  return JSON.parse(json);
-}
+import { loadGcpTtsCredentials } from "@/lib/gcpTtsCreds";
 
 function getClient() {
   try {
-    const json = loadGcpTtsCredentials();
+    const creds = loadGcpTtsCredentials();
+    
+    // normalize PEM for OpenSSL
+    if (typeof creds.private_key === "string") {
+      let pk = creds.private_key;
+      if (pk.includes("\\n")) pk = pk.replace(/\\n/g, "\n");
+      pk = pk.replace(/\r\n/g, "\n").trim();
+      if (!pk.startsWith("-----BEGIN PRIVATE KEY-----")) pk = "-----BEGIN PRIVATE KEY-----\n" + pk;
+      if (!pk.endsWith("-----END PRIVATE KEY-----")) pk = pk + "\n-----END PRIVATE KEY-----";
+      creds.private_key = pk;
+    }
+
+    const projectId = process.env.GCP_TTS_PROJECT_ID || creds.project_id;
+    if (!projectId) throw new Error("No project id found. Set GCP_TTS_PROJECT_ID or include project_id in GCP_TTS_CREDENTIALS.");
+    
     const client = new TextToSpeechClient({
+      projectId,
       credentials: {
-        client_email: json.client_email,
-        private_key: json.private_key,
+        client_email: creds.client_email,
+        private_key: creds.private_key,
       },
-      projectId: json.project_id,
     });
     return client;
   } catch (err: any) {

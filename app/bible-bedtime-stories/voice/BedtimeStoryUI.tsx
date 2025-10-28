@@ -48,7 +48,7 @@ async function ttsToObjectUrl(opts: {
     voiceName,
   } = opts;
 
-  const res = await fetch("/api/bible-bedtime-stories/tts", {
+  const res = await fetch("/api/tts", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text, languageCode, speakingRate, pitch, voiceName }),
@@ -58,9 +58,22 @@ async function ttsToObjectUrl(opts: {
     try { err = await res.json(); } catch {}
     throw new Error(err?.error || `TTS failed (${res.status})`);
   }
-  const buf = await res.arrayBuffer();
-  const blob = new Blob([buf], { type: "audio/mpeg" });
-  return URL.createObjectURL(blob);
+  const data = await res.json();
+  if (data.fallback) {
+    throw new Error("TTS fallback mode - browser TTS not implemented in this component");
+  }
+  if (data.mp3Base64) {
+    // Convert base64 to blob
+    const byteCharacters = atob(data.mp3Base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: "audio/mpeg" });
+    return URL.createObjectURL(blob);
+  }
+  throw new Error("Invalid TTS response format");
 }
 
 export default function BedtimeStoryUI() {

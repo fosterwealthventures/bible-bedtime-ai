@@ -5,6 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = process.env.IMAGEN_MODEL || "imagen-3.0";  // other options: imagen-3.0-fast
 
+// Ensure these API routes never prerender and always use the Node runtime
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export const runtime = "nodejs";
 
 type Body = {

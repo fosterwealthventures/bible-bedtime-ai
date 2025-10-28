@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
-type AgeBucket = "2-4" | "5-8" | "9-12";
+import { AgeBucket } from "../../../lib/bible/types";
 
 function minutesToTargetWords(mins: number) {
   // bedtime pace ~ 75–100 wpm; we aim mid ~ 85 wpm

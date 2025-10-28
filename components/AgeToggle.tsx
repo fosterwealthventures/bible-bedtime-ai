@@ -1,47 +1,44 @@
 "use client";
-import { useMemo } from "react";
 
-export type AgeBucket = "2-4" | "5-8" | "9-12";
-
-export function AgeToggle({
-  value,
-  onChange,
-  className = "",
-}: {
-  value: AgeBucket;
-  onChange: (v: AgeBucket) => void;
-  className?: string;
-}) {
-  const items: AgeBucket[] = ["2-4", "5-8", "9-12"];
-  return (
-    <div className={"flex gap-2 " + className} role="tablist" aria-label="Age range">
-      {items.map((v) => {
-        const active = v === value;
-        return (
-          <button
-            key={v}
-            role="tab"
-            aria-selected={active}
-            onClick={() => onChange(v)}
-            className={[
-              "px-3 py-1 rounded-full border",
-              active ? "bg-purple-600 text-white border-purple-600" : "bg-white text-purple-700 border-purple-200 hover:border-purple-400",
-            ].join(" ")}
-          >
-            Ages {v}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-export function agePrompt(age: AgeBucket) {
-  if (age === "2-4") return "for toddlers and preschoolers (ages 2–4): extremely simple sentences, soothing tone, gentle vocabulary.";
-  if (age === "5-8") return "for early readers (ages 5–8): short sentences, vivid imagery, friendly dialogue.";
-  return "for preteens (ages 9–12): richer vocabulary, slightly longer paragraphs, age-appropriate adventure and reflection.";
-}
+import React from "react";
+import { AGE_BUCKETS } from "@/lib/bible/age";
+import type { AgeBucket } from "@/lib/bible/types";
 
 export function badgeText(age: AgeBucket) {
-  return "Ages " + age;
+  if (age === "2-4") return "Toddlers (2–4)";
+  if (age === "5-8") return "Kids (5–8)";
+  return "Preteens (9–12)";
+}
+
+interface Props {
+  value: AgeBucket;
+  onChange: (age: AgeBucket) => void;
+  className?: string;
+}
+
+export default function AgeToggle({ value, onChange, className }: Props) {
+  return (
+    <div className={className ?? ""} role="radiogroup" aria-label="Select age range">
+      <div className="inline-flex rounded-2xl border shadow-sm overflow-hidden">
+        {AGE_BUCKETS.map((a) => {
+          const active = a === value;
+          return (
+            <button
+              key={a}
+              role="radio"
+              aria-checked={active}
+              onClick={() => onChange(a)}
+              className={[
+                "px-3 py-2 text-sm focus:outline-none focus-visible:ring",
+                active ? "bg-brand-plum text-white" : "bg-background text-foreground",
+                "hover:opacity-90 transition",
+              ].join(" ")}
+            >
+              {badgeText(a)}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }

@@ -11,7 +11,13 @@ export default function PlayButton({ text }: { text: string }) {
   const onPlay = async () => {
     if (!text?.trim()) return;
     setPlaying(true);
-    await speakText(text, { rate: 1, pitch: 1, volume: 1 });
+    try {
+      await speakText(text, { rate: 1, pitch: 1, volume: 1 });
+    } catch (error) {
+      console.error("Error playing audio:", error);
+    } finally {
+      setPlaying(false);
+    }
   };
 
   const onStop = () => {

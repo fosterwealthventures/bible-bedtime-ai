@@ -1,7 +1,6 @@
 // lib/useBedtime.ts (client)
 import { useState } from "react";
-
-export type AgeBucket = "2-4" | "5-8" | "9-12";
+import { AgeBucket } from "./bible/types";
 
 export function useBedtime() {
   const [loading, setLoading] = useState(false);

@@ -1,4 +1,5 @@
 import "./globals.css";
+import "@/styles/accessibility.css";
 import type { Metadata } from "next";
 import ClientInit from "./client-init";
 import SiteHeader from "@/components/SiteHeader";
@@ -13,12 +14,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} min-h-screen bg-background antialiased`}>
         <UIProvider>
           <ClientInit />
           <SiteHeader />
-          {children}
+          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            {children}
+          </div>
         </UIProvider>
       </body>
     </html>

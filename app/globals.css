@@ -6,6 +6,11 @@
 html, body {
   background: linear-gradient(180deg, #faf8ff 0%, #ffffff 60%);
   color: #1f1d2b;
+  overflow-x: hidden;
+}
+
+.page-container {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
 }
 @layer components {
   .btn-primary {
