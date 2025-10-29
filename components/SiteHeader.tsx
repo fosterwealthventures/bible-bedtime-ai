@@ -29,8 +29,8 @@ export default function SiteHeader() {
       <div className="container flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
           <div className="relative h-9 w-9 sm:h-10 sm:w-10">
-            {/* Put your logo file at public/logo.png */}
-            <Image src="/logo.png" alt="Bible Bedtime AI logo" fill sizes="40px" className="object-contain" priority />
+            {/* Put your logo file at public/bible-bedtime-logo.png */}
+            <Image src="/bible-bedtime-logo.png" alt="Bible Bedtime AI logo" fill sizes="40px" className="object-contain" priority />
           </div>
           <div className="flex flex-col leading-tight">
             <span className="text-lg font-semibold text-brand-sun drop-shadow">Bible Bedtime Stories</span>
