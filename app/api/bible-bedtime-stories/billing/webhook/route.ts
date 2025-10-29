@@ -22,11 +22,21 @@ export async function POST(req: NextRequest) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     const metaUserId = session.metadata?.userId!;
-    // Look up the price to decide plan:
-    const priceId = session.line_items?.data?.[0]?.price?.id || (session as any).display_items?.[0]?.plan?.id;
-    const plan = priceId === process.env.STRIPE_PRICE_YEARLY ? "yearly" : "monthly";
+    const priceId = (session as any).line_items?.data?.[0]?.price?.id || (session as any).display_items?.[0]?.plan?.id;
 
-    // await db.user.update({ where: { id: metaUserId }, data: { plan } });
+    const mapping: Record<string, string | undefined> = {
+      [String(process.env.STRIPE_PRICE_BASIC_MONTHLY || "")]: "BASIC",
+      [String(process.env.STRIPE_PRICE_BASIC_YEARLY || "")]: "BASIC",
+      [String(process.env.STRIPE_PRICE_FAMILY_MONTHLY || "")]: "FAMILY",
+      [String(process.env.STRIPE_PRICE_FAMILY_YEARLY || "")]: "FAMILY",
+      [String(process.env.STRIPE_PRICE_FPLUS_MONTHLY || "")]: "FAMILY_PLUS",
+      [String(process.env.STRIPE_PRICE_FPLUS_YEARLY || "")]: "FAMILY_PLUS",
+      [String(process.env.STRIPE_PRICE_MONTHLY || "")]: "BASIC",
+      [String(process.env.STRIPE_PRICE_YEARLY || "")]: "BASIC",
+    };
+    const plan = mapping[priceId] || "BASIC";
+    const period_end = (session as any).current_period_end || (session as any).subscription?.current_period_end;
+    // TODO: persist { plan, period_end } for metaUserId in your DB
   }
 
   return NextResponse.json({ received: true });

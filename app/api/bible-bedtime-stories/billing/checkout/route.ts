@@ -8,17 +8,27 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-06-20" as any });
-  const { tier, userId } = await req.json(); // pass your signed-in user id
+  const { plan, interval, userId } = await req.json();
 
-  const price =
-    tier === "yearly" ? process.env.STRIPE_PRICE_YEARLY! : process.env.STRIPE_PRICE_MONTHLY!;
+  const map: Record<string, string | undefined> = {
+    BASIC_monthly: process.env.STRIPE_PRICE_BASIC_MONTHLY,
+    BASIC_yearly: process.env.STRIPE_PRICE_BASIC_YEARLY,
+    FAMILY_monthly: process.env.STRIPE_PRICE_FAMILY_MONTHLY,
+    FAMILY_yearly: process.env.STRIPE_PRICE_FAMILY_YEARLY,
+    FAMILY_PLUS_monthly: process.env.STRIPE_PRICE_FPLUS_MONTHLY,
+    FAMILY_PLUS_yearly: process.env.STRIPE_PRICE_FPLUS_YEARLY,
+  };
+
+  const key = `${String(plan || "BASIC").toUpperCase()}_${interval === "yearly" ? "yearly" : "monthly"}`;
+  const price = map[key] || (interval === "yearly" ? process.env.STRIPE_PRICE_YEARLY : process.env.STRIPE_PRICE_MONTHLY);
+  if (!price) return NextResponse.json({ error: "Price not configured" }, { status: 400 });
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     line_items: [{ price, quantity: 1 }],
-    success_url: `${process.env.APP_URL}/bible-bedtime-stories?success=1`,
-    cancel_url: `${process.env.APP_URL}/bible-bedtime-stories?canceled=1`,
-    metadata: { userId },
+    success_url: `${process.env.APP_URL}/pricing?success=1`,
+    cancel_url: `${process.env.APP_URL}/pricing?canceled=1`,
+    metadata: { userId, plan: String(plan || "BASIC").toUpperCase(), interval },
   });
 
   return NextResponse.json({ url: session.url });

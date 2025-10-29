@@ -1,14 +1,17 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useUI } from "@/lib/ui-state";
 import { ALL_TOPICS } from "@/lib/content";
-import { StoryCard } from "@/components/StoryCard";
+import { StoryCard } from "@/components/StoryCardLegacy";
 import AgeToggle from "@/components/AgeToggle";
 import { AgeBucket } from "@/lib/bible/types";
 import ThemeChips from "@/components/ThemeChips";
 import { ThemeKey } from "@/lib/content";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import { placeholderArtUrl } from "@/components/StoryArt";
+import { storyImageUrlForId } from "@/lib/art";
 
 export default function ClientHome() {
   const { lang } = useUI();
@@ -46,7 +49,17 @@ export default function ClientHome() {
         </div>
         <div className="rounded-2xl p-6 bg-white border border-purple-100 shadow-soft">
           <div className="badge mb-3">{lang === "en" ? "Soothing narration" : "Narración suave"}</div>
-          <img src={`https://via.placeholder.com/400x300?text=${encodeURIComponent(featured[0]?.title || "Bible Story")}`} alt="" className="w-full h-auto rounded-xl" />
+          {/* Keep hero art compact so it doesn’t dominate the page */}
+          <div className="relative w-full h-48 sm:h-56 md:h-64 rounded-xl overflow-hidden">
+            <Image
+              src={storyImageUrlForId(featured[0]?.id) || placeholderArtUrl(featured[0]?.title || "Bible Story")}
+              alt={featured[0]?.title || "Bible Story"}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+              priority={false}
+            />
+          </div>
         </div>
       </section>
       <section className="container mt-6">

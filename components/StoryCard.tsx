@@ -1,97 +1,96 @@
 "use client";
-import { useState, useMemo } from "react";
-import { useUI } from "@/lib/ui-state";
-import { ALL_TOPICS, type StoryTopic } from "@/lib/content";
+import Image from "next/image";
+import Link from "next/link";
+import { StoryMeta, Language } from "@/types/story";
 
-export function StoryCard({ id }: { id: string }) {
-  const { lang } = useUI();
-  const story = useMemo(() => ALL_TOPICS.find(s => s.id === id), [id]);
-  const [loading, setLoading] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-
-  if (!story) {
-    return <div>Story not found</div>;
-  }
-
-  const play = async () => {
-    setLoading(true);
-    try {
-      // Generate a story using our new API
-      const response = await fetch(`/api/story`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          topic: story.title,
-          age: "5-8", // Default age, could be made configurable
-          minutes: 15, // Default length, could be made configurable
-          theme: story.theme,
-          lang: lang === 'es' ? 'ES' : 'EN'
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Now convert the generated story to audio
-        const ttsResponse = await fetch(`/api/tts`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            text: data.text,
-            lang: lang === 'es' ? 'es-US' : 'en-US'
-          }),
-        });
-
-        if (ttsResponse.ok) {
-          const data = await ttsResponse.json();
-          if (data.fallback) {
-            console.error('TTS fallback mode, using browser TTS');
-            // Here you could implement browser TTS fallback
-          } else if (data.mp3Base64) {
-            // Convert base64 to blob
-            const byteCharacters = atob(data.mp3Base64);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-              byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const audioBlob = new Blob([byteArray], { type: 'audio/mp3' });
-            const audioUrl = URL.createObjectURL(audioBlob);
-            setAudioUrl(audioUrl);
-          }
-        } else {
-          console.error('Failed to generate audio');
-        }
-      } else {
-        console.error('Failed to generate story');
-      }
-    } catch (error) {
-      console.error('Error playing audio:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+export default function StoryCard({
+  story,
+  lang = "en",
+}: { story: StoryMeta; lang?: Language }) {
+  const title = lang === "es" ? story.title_es : story.title_en;
 
   return (
-    <div className="card overflow-hidden">
-      <div className="relative">
-        <img src={`https://via.placeholder.com/400x300?text=${encodeURIComponent(story.title)}`} alt="" className="w-full h-44 object-cover" />
-        <span className="badge absolute top-3 left-3">{story.theme}</span>
-      </div>
-      <div className="p-4">
-        <h3 className="font-semibold mb-1 text-brand-plum">{story.title}</h3>
-        <p className="text-gray-600 text-sm mb-4">{story.blurb || `A Bible story about ${story.title.toLowerCase()}`}</p>
-        <div className="flex items-center justify-between">
-          <button onClick={play} disabled={loading} className="btn-primary disabled:opacity-60">
-            {loading ? "Loading…" : "Listen Now"}
-          </button>
-          {audioUrl && (<audio controls src={audioUrl} className="ml-3 w-44" />)}
+    <article
+      className="group relative overflow-hidden rounded-[28px] shadow-2xl ring-1 ring-black/10
+                 bg-[#0C2657]"
+      style={{
+        background:
+          `linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(12,38,87,0.96) 45%),
+           ${story.color ?? "#2C3E86"}`,
+      }}
+    >
+      {/* Poster (3:4) with glow */}
+      <div className="relative aspect-[3/4] overflow-hidden">
+        <Image
+          src={story.image || "/stories/_placeholder.png"}
+          alt={title}
+          fill
+          priority={false}
+          sizes="(max-width: 768px) 50vw, 320px"
+          className="object-cover"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0C2657]/85 via-[#0C2657]/40 to-transparent" />
+        {/* Age badges */}
+        <div className="absolute left-3 top-3 flex flex-wrap gap-1 pr-14">
+          {story.age.map((a) => (
+            <span
+              key={a}
+              className="rounded-full bg-amber-300 px-2.5 py-1 text-[11px] font-extrabold
+                         text-[#0C2657] shadow"
+            >
+              {a}
+            </span>
+          ))}
         </div>
       </div>
-    </div>
+
+      {/* Body */}
+      <div className="p-4">
+        <h3
+          className="text-[17px] font-extrabold leading-snug text-white"
+          style={{
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {title}
+        </h3>
+
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-blue-100/90">
+          <span className="rounded-full bg-[#122C66] px-2.5 py-1 ring-1 ring-white/10">
+            {lang === "es" ? "Duraciones" : "Durations"}:{" "}
+            {story.durationMin.join(" / ")}{" "}
+            {lang === "es" ? "min" : "min"}
+          </span>
+          <span className="rounded-full bg-[#122C66] px-2.5 py-1 ring-1 ring-white/10">
+            AI + Audio
+          </span>
+        </div>
+
+        <div className="mt-4 flex items-center gap-2">
+          <Link
+            href={`/bible-bedtime-stories?story=${story.slug}&age=${story.age[0]}&minutes=${story.durationMin[0]}&lang=${lang}`}
+            className="inline-flex items-center justify-center rounded-2xl bg-amber-300 px-4 py-2
+                       font-semibold text-[#0C2657] shadow hover:translate-y-[1px] transition"
+          >
+            {lang === "es" ? "Comenzar" : "Start story"}
+          </Link>
+          <button
+            onClick={() =>
+              window.dispatchEvent(
+                new CustomEvent("preview:play", { detail: story.slug })
+              )
+            }
+            className="rounded-2xl border border-amber-300/60 px-3 py-2 text-amber-200
+                       hover:bg-amber-300/10 transition"
+            aria-label="Preview audio"
+          >
+            ▶ {lang === "es" ? "Vista previa" : "Preview"}
+          </button>
+        </div>
+      </div>
+    </article>
   );
 }

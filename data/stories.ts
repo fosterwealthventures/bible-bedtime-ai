@@ -1,43 +1,28 @@
-export type Story = {
-  id: string;
-  age: "2-4" | "5-8" | "9-12";
-  image: string;
-  title: { en: string; es: string };
-  subtitle: { en: string; es: string };
-  theme?: string;
-  tags?: string[];
-};
+import { StoryMeta } from "@/types/story";
 
-export const STORIES: Story[] = [
-  {
-    id: "creation",
-    age: "2-4",
-    image: "https://via.placeholder.com/400x300?text=Creation",
-    title: { en: "Creation: God Made It Good", es: "La Creación: Dios lo Hizo Bueno" },
-    subtitle: { en: "God's world is wonderful and calm.", es: "El mundo de Dios es maravilloso y calmado." },
-    theme: "Peace",
-    tags: ["Peace", "Thankfulness"]
-  },
-  {
-    id: "noah",
-    age: "5-8",
-    image: "https://via.placeholder.com/400x300?text=Noah",
-    title: { en: "Noah's Ark of Care", es: "El Arca de Noé de Cuidado" },
-    subtitle: { en: "God keeps us safe.", es: "Dios nos mantiene seguros." },
-    theme: "Protection",
-    tags: ["Protection", "God's Love"]
-  },
-  {
-    id: "david",
-    age: "9-12",
-    image: "https://via.placeholder.com/400x300?text=David",
-    title: { en: "David's Quiet Courage", es: "El Valiente Silencio de David" },
-    subtitle: { en: "Small but brave with God's help.", es: "Pequeño pero valiente con la ayuda de Dios." },
-    theme: "Courage",
-    tags: ["Courage", "God's Love"]
-  },
+export const STORIES: StoryMeta[] = [
+  { id:"daniel-lions", slug:"daniel-lions", title_en:"Daniel and the Lions", title_es:"Daniel y los Leones",
+    age:["5-8","9-12"], durationMin:[5,10,15,20,30], image:"/stories/daniel-lions.png", color:"#F4C045" },
+  { id:"david-goliath", slug:"david-goliath", title_en:"David & Goliath", title_es:"David y Goliat",
+    age:["5-8","9-12"], durationMin:[5,10,15,20,30], image:"/stories/david-goliath.png", color:"#F0905A" },
+  { id:"noah-ark", slug:"noah-ark", title_en:"Noah’s Ark", title_es:"El Arca de Noé",
+    age:["2-4","5-8"], durationMin:[5,10,15,20], image:"/stories/noah-ark.png", color:"#6CC3E1" },
+  { id:"moses-sea", slug:"moses-sea", title_en:"Moses & the Sea", title_es:"Moisés y el Mar",
+    age:["5-8","9-12"], durationMin:[5,10,15,20,30], image:"/stories/moses-sea.png", color:"#5BA0FF" },
+  { id:"ruth-kindness", slug:"ruth-kindness", title_en:"Ruth’s Kindness", title_es:"La Bondad de Rut",
+    age:["2-4","5-8"], durationMin:[5,10,15], image:"/stories/ruth-kindness.png", color:"#F2A1C2" },
+  { id:"psalm-23", slug:"psalm-23", title_en:"Psalm 23: The Shepherd", title_es:"Salmo 23: El Pastor",
+    age:["2-4","5-8","9-12"], durationMin:[5,10,15,20], image:"/stories/psalm-23.png", color:"#9ED27A" },
+  { id:"jesus-storm", slug:"jesus-storm", title_en:"Jesus Calms the Storm", title_es:"Jesús Calma la Tormenta",
+    age:["2-4","5-8"], durationMin:[5,10,15], image:"/stories/jesus-storm.png", color:"#8FA8FF" },
+  { id:"good-samaritan", slug:"good-samaritan", title_en:"The Good Samaritan", title_es:"El Buen Samaritano",
+    age:["5-8","9-12"], durationMin:[5,10,15,20], image:"/stories/good-samaritan.png", color:"#FFC66B" },
+  { id:"loving-father", slug:"loving-father", title_en:"The Loving Father", title_es:"El Padre Amoroso",
+    age:["5-8","9-12"], durationMin:[5,10,15,20], image:"/stories/loving-father.png", color:"#FFD58E" },
+  { id:"elijah-fed", slug:"elijah-fed", title_en:"Elijah is Fed", title_es:"Elías es Alimentado",
+    age:["2-4","5-8"], durationMin:[5,10,15], image:"/stories/elijah-fed.png", color:"#A89BFF" },
+  { id:"jairus-daughter", slug:"jairus-daughter", title_en:"Jairus’ Daughter", title_es:"La Hija de Jairo",
+    age:["5-8","9-12"], durationMin:[5,10,15,20], image:"/stories/jairus-daughter.png", color:"#F59EB0" },
+  { id:"queen-esther", slug:"queen-esther", title_en:"Queen Esther’s Courage", title_es:"El Valor de la Reina Ester",
+    age:["5-8","9-12"], durationMin:[5,10,15,20,30], image:"/stories/queen-esther.png", color:"#E6B1FF" },
 ];
-
-export function getStory(id: string): Story | undefined {
-  return STORIES.find(s => s.id === id);
-}

@@ -5,8 +5,11 @@ import React from "react";
 import AgeToggle from "@/components/AgeToggle";
 import { AgeBucket } from "@/lib/bible/types";
 import { THEMES, ALL_TOPICS, ThemeKey } from "@/lib/content";
+import Image from "next/image";
+import { placeholderArtUrl } from "@/components/StoryArt";
+import { storyImageUrlForId } from "@/lib/art";
 
-type Minutes = 15|30|60;
+type Minutes = 5 | 10 | 15 | 20 | 30;
 
 type StoryPayload = {
   title: string;
@@ -21,7 +24,7 @@ type StoryPayload = {
 
 export default function ClientBiblePage() {
   const [age, setAge] = React.useState<AgeBucket>("5-8");
-  const [minutes, setMinutes] = React.useState<Minutes>(30);
+  const [minutes, setMinutes] = React.useState<Minutes>(10);
   const [lang, setLang] = React.useState<"EN"|"ES">("EN");
   const [activeTheme, setActiveTheme] = React.useState<ThemeKey | "All">("All");
   const [loadingId, setLoadingId] = React.useState<string>();
@@ -148,7 +151,7 @@ export default function ClientBiblePage() {
       <div className="flex flex-wrap items-center gap-3">
         <AgeToggle value={age} onChange={setAge} />
         <div className="ml-auto flex gap-2">
-          {[15,30,60].map((m) => (
+          {[5,10,15,20,30].map((m) => (
             <button
               key={m}
               className={`px-3 py-1 rounded-full border ${minutes===m? "bg-primary text-primary-foreground":""}`}
@@ -182,14 +185,17 @@ export default function ClientBiblePage() {
       {/* 12-card grid */}
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
         {visible.map(card=>(
-          <article key={card.id} className="rounded-2xl p-4 border bg-card">
+          <article key={card.id} className="rounded-2xl border bg-card overflow-hidden">
+            {/* Artwork */}
+            <div className="story-art overflow-hidden">
+              <Image src={storyImageUrlForId(card.id) || placeholderArtUrl(card.title, card.theme)} alt={`${card.title} artwork`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+              <span className="text-xs px-2 py-1 rounded bg-muted absolute top-3 left-3">{card.theme}</span>
+            </div>
+            <div className="p-4">
             <header className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold">{card.title}</h3>
-              <span className="text-xs px-2 py-1 rounded bg-muted">{card.theme}</span>
+              <h3 className="font-semibold">{lang === 'ES' ? (card as any).titleEs || card.title : card.title}</h3>
             </header>
-            <p className="text-sm text-muted-foreground mb-4">
-              Artwork placeholder. (Image generation can be enabled later.)
-            </p>
+            <p className="text-sm text-muted-foreground mb-4">{lang === 'ES' ? (card as any).blurbEs || `Una historia bíblica sobre ${card.title.toLowerCase()}` : card.blurb || `A Bible story about ${card.title.toLowerCase()}`}</p>
             <div className="flex items-center gap-2">
               <button
                 className="px-3 py-1 rounded bg-primary text-primary-foreground"
@@ -198,6 +204,7 @@ export default function ClientBiblePage() {
               >
                 {loadingId===card.title ? "Generating…" : "Generate"}
               </button>
+            </div>
             </div>
           </article>
         ))}

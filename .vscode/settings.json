@@ -1,5 +1,8 @@
 {
   "css.lint.unknownAtRules": "ignore",
   "editor.quickSuggestions": { "strings": true },
-  "tailwindCSS.includeLanguages": { "plaintext": "html" }
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "html"
+  },
+  "chatgpt.runCodexInWindowsSubsystemForLinux": true
 }

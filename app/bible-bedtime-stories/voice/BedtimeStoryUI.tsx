@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { Segmented } from "@/components/ui/Segmented";
+import { Chips } from "@/components/ui/Chips";
 
 type GenerateInput = {
   theme?: string;
@@ -80,7 +82,7 @@ export default function BedtimeStoryUI() {
   // form inputs
   const [theme, setTheme] = useState("");
   const [age, setAge] = useState<"toddler" | "early-reader" | "tween">("early-reader");
-  const [minutes, setMinutes] = useState(4);
+  const [minutes, setMinutes] = useState(10);
   const [childName, setChildName] = useState("");
   const [version, setVersion] = useState<"WEB" | "KJV" | "paraphrase">("WEB");
 
@@ -150,111 +152,143 @@ export default function BedtimeStoryUI() {
     }
   }
 
-  const styles = {
-    page: { background: "#0b1020", minHeight: "100vh", color: "#ffffff" },
-    wrap: { maxWidth: 980, margin: "0 auto", padding: "32px 16px" },
-    title: { fontSize: 34, fontWeight: 800 as const, marginBottom: 6 },
-    subtitle: { opacity: 0.7, marginBottom: 24 },
-    grid: { display: "grid", gridTemplateColumns: "1fr", gap: 16 } as const,
-    row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 } as const,
-    card: { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 16, padding: 16 },
-    label: { fontSize: 13, opacity: 0.85, marginBottom: 6, display: "block" },
-    input: { width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)", outline: "none", background: "rgba(255,255,255,0.08)", color: "#fff" } as const,
-    select: { width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)", outline: "none", background: "rgba(255,255,255,0.08)", color: "#fff" } as const,
-    small: { fontSize: 12, opacity: 0.7 },
-    btnRow: { display: "flex", gap: 12, flexWrap: "wrap" as const, marginTop: 12 },
-    btn: { background: "#7c3aed", color: "#fff", border: "none", padding: "10px 14px", borderRadius: 999, fontWeight: 700, cursor: "pointer" } as const,
-    ghost: { background: "transparent", color: "#c4b5fd", border: "1px solid #7c3aed", padding: "10px 14px", borderRadius: 999, fontWeight: 700, cursor: "pointer" } as const,
-    h2: { margin: "12px 0 8px 0", fontSize: 22, fontWeight: 800 as const },
-    verse: { fontStyle: "italic" },
-    error: { background: "#3f1d1d", border: "1px solid #7f1d1d", padding: 10, borderRadius: 10, marginTop: 12, color: "#fecaca" },
-  };
-
   return (
-    <div style={styles.page}>
-      <div style={styles.wrap}>
-        <h1 style={styles.title}>Bible Bedtime Stories</h1>
-        <p style={styles.subtitle}>Generate a gentle bedtime story with a memory verse and prayer, then listen with soothing narration.</p>
+    <div className="min-h-[calc(100vh-64px)] bg-night relative overflow-hidden text-white">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="star absolute top-8 left-10 text-xs" />
+        <div className="star absolute top-24 right-16 text-sm" style={{ animationDelay: ".6s" }} />
+        <div className="star absolute top-40 left-1/2 text-[10px]" style={{ animationDelay: "1.2s" }} />
+      </div>
 
-        <div style={styles.grid}>
-          <div style={styles.card}>
-            <div style={styles.row}>
-              <div>
-                <label style={styles.label}>Theme</label>
-                <input style={styles.input} placeholder="e.g., peace, courage" value={theme} onChange={e=>setTheme(e.target.value)} />
-              </div>
-              <div>
-                <label style={styles.label}>Age</label>
-                <select style={styles.select} value={age} onChange={e=>setAge(e.target.value as any)}>
-                  <option value="toddler">Toddler (3–4)</option>
-                  <option value="early-reader">Early reader (5–7)</option>
-                  <option value="tween">Tween (8–11)</option>
-                </select>
-              </div>
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 relative z-[1]">
+        <header className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Bible Bedtime Stories</h1>
+          <p className="mt-2 text-white/80">
+            Generate a gentle bedtime story with a memory verse and prayer, then listen with soothing narration.
+          </p>
+        </header>
+
+        <div className="rounded-3xl bg-white/5 backdrop-blur-sm ring-1 ring-white/10 p-5 sm:p-6 lg:p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Theme */}
+            <div>
+              <label className="block text-sm text-white/80 mb-2">Theme</label>
+              <input
+                value={theme}
+                onChange={(e) => setTheme(e.target.value)}
+                placeholder="e.g., peace, courage"
+                className="w-full rounded-2xl bg-white/90 text-slate-900 px-4 py-3 outline-none"
+              />
+              <Chips className="mt-3" items={["Peace","Courage","Kindness","Thankfulness","Obedience","Joy"]} onPick={(t)=>setTheme(t)} />
             </div>
 
-            <div style={styles.row}>
-              <div>
-                <label style={styles.label}>Length (minutes)</label>
-                <input style={styles.input} type="number" min={2} max={12} value={minutes} onChange={e=>setMinutes(parseInt(e.target.value || "4"))}/>
-              </div>
-              <div>
-                <label style={styles.label}>Child’s name (optional)</label>
-                <input style={styles.input} placeholder="e.g., Alex" value={childName} onChange={e=>setChildName(e.target.value)} />
-              </div>
+            {/* Age */}
+            <div>
+              <label className="block text-sm text-white/80 mb-2">Age</label>
+              <Segmented
+                value={age}
+                onChange={(v) => setAge(v as any)}
+                options={[
+                  { label: "2–4", value: "toddler" },
+                  { label: "5–8", value: "early-reader" },
+                  { label: "9–12", value: "tween" },
+                ]}
+              />
             </div>
 
-            <div style={styles.row}>
-              <div>
-                <label style={styles.label}>Verse wording</label>
-                <select style={styles.select} value={version} onChange={e=>setVersion(e.target.value as any)}>
-                  <option value="WEB">WEB (public domain)</option>
-                  <option value="KJV">KJV (public domain)</option>
-                  <option value="paraphrase">Paraphrase</option>
-                </select>
-                <div style={styles.small}>WEB/KJV avoids licensing issues.</div>
-              </div>
-              <div />
+            {/* Length */}
+            <div>
+              <label className="block text-sm text-white/80 mb-2">Length (minutes)</label>
+              <Segmented
+                value={minutes}
+                onChange={(v) => setMinutes(Number(v))}
+                options={[
+                  { label: "5", value: 5 },
+                  { label: "10", value: 10 },
+                  { label: "15", value: 15 },
+                  { label: "20", value: 20 },
+                  { label: "30", value: 30 },
+                ]}
+              />
             </div>
 
-            <div style={styles.btnRow}>
-              <button style={styles.btn} onClick={handleGenerate} disabled={loading}>
-                {loading ? "Generating…" : "Generate"}
-              </button>
-              <a href="/bible-bedtime-stories/voice" style={{...styles.ghost, textDecoration:"none", display:"inline-block"}}>Open Voice Tester</a>
+            {/* Child name */}
+            <div>
+              <label className="block text-sm text-white/80 mb-2">Child’s name (optional)</label>
+              <input
+                value={childName}
+                onChange={(e) => setChildName(e.target.value)}
+                placeholder="e.g., Alex"
+                className="w-full rounded-2xl bg-white/90 text-slate-900 px-4 py-3 outline-none"
+              />
             </div>
-            {error && <div style={styles.error}>Error: {error}</div>}
+
+            {/* Verse wording */}
+            <div className="lg:col-span-2">
+              <label className="block text-sm text-white/80 mb-2">Verse wording</label>
+              <select
+                value={version}
+                onChange={(e) => setVersion(e.target.value as any)}
+                className="w-full rounded-2xl bg-white/90 text-slate-900 px-4 py-3 outline-none"
+              >
+                <option value="WEB">WEB (public domain)</option>
+                <option value="KJV">KJV (public domain)</option>
+                <option value="paraphrase">Paraphrase</option>
+              </select>
+              <p className="text-xs text-white/60 mt-2">WEB/KJV avoids licensing issues.</p>
+            </div>
           </div>
 
-          {/* Story card */}
-          {data && (
-            <div style={styles.card}>
-              <h2 style={styles.h2}>{data.title || "Tonight’s Story"}</h2>
-              <p style={{whiteSpace:"pre-wrap", lineHeight:1.6}}>{data.story}</p>
-
-              <h3 style={{marginTop:18, marginBottom:6}}>Memory Verse — <span style={styles.verse}>{data.verseRef}</span></h3>
-              <p style={{whiteSpace:"pre-wrap"}}><em>{data.verseText}</em></p>
-
-              <h3 style={{marginTop:18, marginBottom:6}}>Prayer</h3>
-              <p style={{whiteSpace:"pre-wrap"}}>{data.prayer}</p>
-
-              {data.talkQuestion && (
-                <>
-                  <h3 style={{marginTop:18, marginBottom:6}}>Talk about it</h3>
-                  <p>{data.talkQuestion}</p>
-                </>
-              )}
-
-              <div style={{...styles.btnRow, marginTop:16}}>
-                <button style={styles.btn} onClick={handleSpeak}>▶ Generate & Play</button>
-                <button style={styles.ghost} onClick={()=>audioRef.current?.pause()} disabled={!audioUrl}>⏸ Pause</button>
-                <button style={styles.ghost} onClick={()=>{ if(audioRef.current){ audioRef.current.pause(); audioRef.current.currentTime=0; } }} disabled={!audioUrl}>⏹ Stop</button>
-              </div>
-
-              <audio ref={audioRef} src={audioUrl ?? undefined} controls style={{marginTop:12, width:"100%", display: audioUrl? "block":"none"}} />
-            </div>
+          {/* Actions */}
+          <div className="mt-8 flex flex-col sm:flex-row gap-3">
+            <button
+              type="button"
+              onClick={handleGenerate}
+              disabled={loading}
+              className="flex-1 rounded-2xl px-5 py-3 font-semibold bg-white text-slate-900 shadow hover:opacity-95 transition disabled:opacity-60"
+            >
+              {loading ? "Generating…" : "Generate Story ✨"}
+            </button>
+            <a
+              href="/bible-bedtime-stories/voice"
+              className="sm:w-56 text-center rounded-2xl px-5 py-3 font-medium bg-white/10 text-white hover:bg-white/15 border border-white/15 transition"
+            >
+              Open Voice Tester
+            </a>
+          </div>
+          {error && (
+            <div className="mt-4 rounded-2xl border border-rose-900/40 bg-rose-900/20 text-rose-100 p-3">Error: {error}</div>
           )}
         </div>
+
+        {/* Story card */}
+        {data && (
+          <div className="mt-6 rounded-3xl bg-white/5 backdrop-blur-sm ring-1 ring-white/10 p-5 sm:p-6 lg:p-8">
+            <h2 className="text-2xl font-extrabold mb-2">{data.title || "Tonight’s Story"}</h2>
+            <p className="whitespace-pre-wrap leading-7">{data.story}</p>
+
+            <h3 className="mt-5 mb-2 font-semibold">Memory Verse — <span className="italic">{data.verseRef}</span></h3>
+            <p className="whitespace-pre-wrap"><em>{data.verseText}</em></p>
+
+            <h3 className="mt-5 mb-2 font-semibold">Prayer</h3>
+            <p className="whitespace-pre-wrap">{data.prayer}</p>
+
+            {data.talkQuestion && (
+              <>
+                <h3 className="mt-5 mb-2 font-semibold">Talk about it</h3>
+                <p>{data.talkQuestion}</p>
+              </>
+            )}
+
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button onClick={handleSpeak} className="rounded-2xl px-5 py-3 font-semibold bg-white text-slate-900 shadow hover:opacity-95 transition">▶ Generate & Play</button>
+              <button onClick={() => audioRef.current?.pause()} disabled={!audioUrl} className="rounded-2xl px-5 py-3 font-medium bg-white/10 text-white hover:bg-white/15 border border-white/15 transition disabled:opacity-60">⏸ Pause</button>
+              <button onClick={() => { if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; } }} disabled={!audioUrl} className="rounded-2xl px-5 py-3 font-medium bg-white/10 text-white hover:bg-white/15 border border-white/15 transition disabled:opacity-60">⏹ Stop</button>
+            </div>
+
+            <audio ref={audioRef} src={audioUrl ?? undefined} controls className={`mt-3 w-full ${audioUrl ? "block" : "hidden"}`} />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 import { useUI } from "@/lib/ui-state";
 import { ALL_TOPICS } from "@/lib/content";
-import { StoryCard } from "@/components/StoryCard";
+import { StoryCard } from "@/components/StoryCardLegacy";
 
 export default function StoriesPage() {
   const { age } = useUI();

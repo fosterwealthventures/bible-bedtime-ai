@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { AgeBucket } from "../lib/bible/types";
 import { badgeText } from "./AgeToggle";
+import Image from "next/image";
+import { placeholderArtUrl } from "@/components/StoryArt";
 
 export default function Artwork({
   title,
@@ -63,18 +65,15 @@ export default function Artwork({
     );
   }
 
+  const fallback = placeholderArtUrl(title, undefined);
   return (
-    <div className="relative overflow-hidden rounded-2xl h-64 w-full bg-gradient-to-br from-purple-100 via-violet-100 to-purple-200 flex items-center">
-      <div className="absolute top-2 left-2 text-xs font-medium bg-purple-600 text-white rounded-full px-2 py-0.5">
+    <div className="relative overflow-hidden rounded-2xl bg-white">
+      <div className="relative w-full h-64">
+        <Image src={fallback} alt={alt} fill className="object-cover" sizes="100vw" />
+      </div>
+      <span className="absolute top-2 left-2 text-xs font-medium bg-purple-600 text-white rounded-full px-2 py-0.5">
         {badgeText(age)}
-      </div>
-      <div className="pl-6">
-        <div className="text-purple-900/70 text-sm">Story artwork</div>
-        <h3 className="text-2xl font-semibold text-purple-900">{title}</h3>
-        <p className="max-w-lg text-purple-800/80 mt-1">
-          A soft, kid-friendly illustration will appear here. (Using fallback while image generation is off.)
-        </p>
-      </div>
+      </span>
     </div>
   );
 }

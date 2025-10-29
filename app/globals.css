@@ -2,11 +2,74 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Night sky gradient helper (apply to sections, not body site-wide if you prefer) */
+.bg-night-sky {
+  background: linear-gradient(to bottom, #1A2C60 0%, #2A3B78 65%, #1A2C60 100%);
+}
+
+/* Subtle vignette on hero for depth */
+.hero-vignette {
+  position: relative;
+  isolation: isolate;
+}
+.hero-vignette::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(60% 60% at 50% 30%, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.15) 100%);
+  z-index: 0;
+}
+
+/* Tiny star dots you can sprinkle */
+.star-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: #F7C94A;
+}
+
+/* Cloud card look */
+.cloud-card {
+  @apply rounded-3xl bg-white/90 backdrop-blur shadow-dream;
+}
+
 /* Background + type rhythm to match original mock */
 html, body {
   background: linear-gradient(180deg, #faf8ff 0%, #ffffff 60%);
   color: #1f1d2b;
   overflow-x: hidden;
+}
+
+:root { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+
+/* Utility: allow a section to break out of the centered layout
+   so its background spans full viewport width */
+.full-bleed {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+@media (prefers-color-scheme: dark) {
+  html, body {
+    background: linear-gradient(180deg, #0b1020 0%, #0e1426 60%);
+    color: #f7f7fb;
+  }
+  .card {
+    /* dark surface */
+    @apply border-purple-900/40 bg-[#121a33] shadow;
+  }
+  .btn-primary {
+    @apply bg-brand-plum text-white hover:bg-brand-plum-dark;
+  }
+  .btn-outline {
+    @apply border-brand-plum text-white hover:bg-brand-plum;
+  }
 }
 
 .page-container {
@@ -26,4 +89,44 @@ html, body {
     /* uses custom shadow defined in tailwind.config.ts */
     @apply rounded-2xl border border-purple-100 bg-white shadow-soft;
   }
+}
+
+/* ---- Starfield utilities for create page ---- */
+@keyframes twinkle {
+  0%, 100% { opacity: .6; transform: translateY(0px); }
+  50% { opacity: 1; transform: translateY(-1px); }
+}
+.bg-night {
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(255,220,170,.12), transparent),
+              radial-gradient(900px 500px at 90% 10%, rgba(180,200,255,.10), transparent),
+              linear-gradient(180deg, #0b1020, #101632 60%, #0b1020);
+}
+.star:before {
+  content: "✦";
+  animation: twinkle 3s ease-in-out infinite;
+  color: rgba(255,255,255,.6);
+}
+
+/* Story artwork sizing helpers (opt-in) */
+.story-art {
+  position: relative;
+  width: 100%;
+  height: 11rem; /* ~176px */
+}
+@media (min-width: 640px) {
+  .story-art { height: 12.5rem; }
+}
+@media (min-width: 1024px) {
+  .story-art { height: 13.5rem; }
+}
+.story-hero-art {
+  position: relative;
+  width: 100%;
+  height: 18rem;
+}
+@media (min-width: 640px) {
+  .story-hero-art { height: 22rem; }
+}
+@media (min-width: 1024px) {
+  .story-hero-art { height: 26rem; }
 }

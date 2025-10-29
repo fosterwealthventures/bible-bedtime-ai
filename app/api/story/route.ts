@@ -1,8 +1,9 @@
 // app/api/story/route.ts
 import { NextResponse } from "next/server";
 import { AgeBucket } from "../../../lib/bible/types";
+import { stableHashSync } from "@/lib/hash";
 
-type Minutes = 15 | 30 | 60;
+type Minutes = 5 | 10 | 15 | 20 | 30 | 45 | 60;
 
 export type StoryPayload = {
   title: string;
@@ -26,9 +27,24 @@ function guidance(age: AgeBucket) {
 }
 
 function targetLength(minutes: Minutes) {
-  if (minutes === 15) return "≈500–700 words";
-  if (minutes === 30) return "≈900–1200 words";
-  return "≈1500–1800 words";
+  switch (minutes) {
+    case 5:
+      return "≈250–350 words";
+    case 10:
+      return "≈450–650 words";
+    case 15:
+      return "≈700–900 words";
+    case 20:
+      return "≈950–1200 words";
+    case 30:
+      return "≈1300–1600 words";
+    case 45:
+      return "≈1900–2300 words";
+    case 60:
+      return "≈2400–2800 words";
+    default:
+      return "≈700–900 words";
+  }
 }
 
 function buildPrompt(p: {
@@ -64,6 +80,16 @@ export async function POST(req: Request) {
 
     const { topic, age, minutes, theme, lang } = await req.json();
 
+    // Cache by input parameters
+    const cacheKey = `story:${stableHashSync({ topic, age, minutes, theme, lang })}`;
+    const now = Date.now();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const mem = (globalThis as any).__bb_cache || ((globalThis as any).__bb_cache = new Map());
+    const hit = mem.get(cacheKey) as { at: number; data: any } | undefined;
+    if (hit && now - hit.at < 10 * 60 * 1000) {
+      return NextResponse.json(hit.data);
+    }
+
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${key}`;
     const body = {
       contents: [{ parts: [{ text: buildPrompt({ topic, age, minutes, theme, lang }) }] }],
@@ -98,6 +124,7 @@ export async function POST(req: Request) {
       }
       // Add legacy field for backward compatibility
       parsed.text = parsed.story;
+      mem.set(cacheKey, { at: now, data: parsed });
       return NextResponse.json(parsed);
     } catch {
       // Fallback: adapt legacy text
@@ -124,6 +151,7 @@ export async function POST(req: Request) {
         ],
         text: raw, // legacy field for your existing UI
       };
+      mem.set(cacheKey, { at: now, data: fallback });
       return NextResponse.json(fallback);
     }
   } catch (e: any) {
