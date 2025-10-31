@@ -1,4 +1,7 @@
 {
+  "name": "bible-bedtime-ai",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
     "env:set": "node scripts/env-set.mjs",
     "dev": "next dev --port 3000",
@@ -6,6 +9,9 @@
     "start": "next start",
     "clean": "node scripts/dev-clean.js",
     "dev:reset": "npm run clean && next dev --port 3000"
+  },
+  "engines": {
+    "node": "20.x"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^5.8.1",

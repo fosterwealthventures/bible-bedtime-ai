@@ -20,3 +20,4 @@ firebase.json
 .firebaserc
 image_base64.txt
 EOF
+.vercel
