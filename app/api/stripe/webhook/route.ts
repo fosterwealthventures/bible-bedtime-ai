@@ -1,59 +1,40 @@
+// app/api/stripe/webhook/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = "nodejs";         // ensure Node runtime (not Edge)
-export const dynamic = "force-dynamic";  // allow reading raw body
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-// Function to get Stripe instance with lazy loading
-async function getStripe() {
-  try {
-    // Dynamic import to avoid throwing at import time if the package isn't used
-    const StripeModule = await import("stripe");
-    return StripeModule.default;
-  } catch (e) {
-    return null;
-  }
-}
-
-export async function POST(req: NextRequest) {
-  // If Stripe isn't configured, acknowledge and exit (prevents build/runtime crashes)
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  const secretKey = process.env.STRIPE_SECRET_KEY;
-  
-  const Stripe = await getStripe();
-
-  if (!Stripe || !webhookSecret || !secretKey) {
-    // Still return 200 so Stripe retries later when you're ready.
+// Minimal, safe webhook: builds even when Stripe isn’t configured
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!secret || !key) {
+    // Don’t crash builds/runs if keys are missing; Stripe will retry later.
     return NextResponse.json({ ok: true, skipped: true }, { status: 200 });
   }
 
-  const stripe = new Stripe(secretKey, { apiVersion: "2024-06-20" });
+  const { default: Stripe } = await import("stripe");
+  const stripe = new Stripe(key, { apiVersion: "2024-06-20" });
 
   const sig = req.headers.get("stripe-signature") || "";
-  const raw = await req.text(); // raw body for signature check
+  const raw = await req.text(); // raw body required for signature verification
 
-  let event;
   try {
-    event = await stripe.webhooks.constructEventAsync(raw, sig, webhookSecret);
+    const event = await stripe.webhooks.constructEventAsync(raw, sig, secret);
+
+    switch (event.type) {
+      case "checkout.session.completed":
+      case "invoice.paid":
+      case "customer.subscription.updated":
+      case "customer.subscription.deleted":
+        // TODO: update entitlements, etc.
+        break;
+      default:
+        break;
+    }
+
+    return NextResponse.json({ received: true }, { status: 200 });
   } catch (err: any) {
-    // Signature mismatch or bad payload
     return NextResponse.json({ error: err.message }, { status: 400 });
   }
-
-  // Handle the events you care about (safe defaults)
-  switch (event.type) {
-    case "checkout.session.completed":
-    case "invoice.paid":
-    case "customer.subscription.updated":
-    case "customer.subscription.deleted":
-      // TODO: update your entitlements here
-      console.log(`✅ Received Stripe event: ${event.type}`);
-      break;
-    default:
-      // ignore other events for now
-      console.log(`ℹ️  Received unhandled Stripe event: ${event.type}`);
-      break;
-  }
-
-  return NextResponse.json({ received: true }, { status: 200 });
 }
-
